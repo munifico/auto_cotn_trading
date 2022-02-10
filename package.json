@@ -17,7 +17,13 @@
   },
   "homepage": "https://github.com/LeeSeungjae00/auto_cotn_trading#readme",
   "dependencies": {
-    "express": "^4.17.2"
+    "axios": "^0.25.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "request": "^2.88.2",
+    "uuid": "^8.3.2",
+    "uuidv4": "^6.2.12"
   },
   "devDependencies": {
     "@types/node": "^17.0.17"
