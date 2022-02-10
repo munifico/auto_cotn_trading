@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/LeeSeungjae00/auto_cotn_trading#readme",
   "dependencies": {
+    "api": "^4.2.0",
     "axios": "^0.25.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
