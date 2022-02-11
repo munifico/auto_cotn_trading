@@ -1,3 +1,9 @@
 .env
 
 /node_modules
+
+yarn.lock
+
+*.map
+*.js
+
