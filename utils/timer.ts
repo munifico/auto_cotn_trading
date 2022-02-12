@@ -7,4 +7,5 @@ const timer = function (time : number) {
 };
 
 
+
 export default timer;
