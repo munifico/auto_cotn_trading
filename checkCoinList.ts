@@ -1,11 +1,13 @@
 import { getCoinList, getDayCandle } from './lib/coin';
 import timer from './utils/timer'
 import { dbConnect, dbInit } from './utils/databases'
+import { exit } from 'node:process';
 
 
 const K = 0.6;
 
-async function main() {
+
+(async () => {
     const conn = dbInit();
     dbConnect(conn);
 
@@ -21,7 +23,6 @@ async function main() {
 
         let volume = coinCandle.high_price - coinCandle.low_price;
         let rangePer = volume / coinCandle.low_price;
-        let amnioticFluid = coinCandle.trade_price - coinCandle.opening_price > 0 ? true : false;
         let targetPrice = coinCandle.trade_price + volume * K;
 
         params = [
@@ -32,16 +33,11 @@ async function main() {
             targetPrice,
             rangePer
         ]
-
-        if (amnioticFluid) {
-            conn.query(sql, params, (err) => {
-                if (err) console.log('query is not excuted. insert fail...\n' + err);
-                else console.log(`insert ${params.join(', ')} success`);
-            })
-        }
+        conn.query(sql, params, (err) => {
+            if (err) console.log('query is not excuted. insert fail...\n' + err);
+            else console.log(`insert ${params.join(', ')} success`);
+        })
     }
+    exit();
+})();
 
-    return;
-}
-
-main();
