@@ -22,8 +22,8 @@ const K = 0.6;
 
 
         let volume = coinCandle.high_price - coinCandle.low_price;
-        let rangePer = volume / coinCandle.low_price;
         let targetPrice = coinCandle.trade_price + volume * K;
+        let rangePer = coinCandle.change_rate;
 
         params = [
             coinCandle.candle_date_time_kst + coinCandle.market,
@@ -33,10 +33,13 @@ const K = 0.6;
             targetPrice,
             rangePer
         ]
-        conn.query(sql, params, (err) => {
-            if (err) console.log('query is not excuted. insert fail...\n' + err);
-            else console.log(`insert ${params.join(', ')} success`);
-        })
+
+        if (rangePer > 0) {
+            conn.query(sql, params, (err) => {
+                if (err) console.log('query is not excuted. insert fail...\n' + err);
+                else console.log(`insert ${params.join(', ')} success`);
+            })
+        }
     }
     exit();
 })();
