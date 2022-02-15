@@ -1,7 +1,6 @@
 import { getCoinList, getDayCandle } from './lib/coin';
 import timer from './utils/timer'
 import { dbConnect, dbInit } from './utils/databases'
-import { exit } from 'node:process';
 
 
 const K = 0.6;
@@ -39,6 +38,7 @@ const K = 0.6;
             else console.log(`insert ${params.join(', ')} success`);
         })
     }
-    exit();
+
+    conn.end();
 })();
 
