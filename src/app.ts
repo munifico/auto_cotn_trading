@@ -10,7 +10,7 @@ const app = express();
 let buyCoinName : string | boolean = false;
 let candidateCoinsBuy : any = [];
 
-let checkCoinListJob = new CronJob.CronJob('0 42 23 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('* * * * * *', async () => {
     candidateCoinsBuy = await checkCoinList();
 }, null, true)
 

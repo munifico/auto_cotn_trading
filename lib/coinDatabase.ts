@@ -10,11 +10,10 @@ export async function getTodayCoinList(conn: Connection, limit: number) {
     const promisePoll = conn.promise();
     const date = new Date();
     let year = date.getFullYear();
-    let month = date.getMonth();
+    let month = date.getMonth() + 1;
     let day = date.getDate() - 1;
 
 
     const [rows,fields] = await promisePoll.query(sql, [year, month, day, limit]);
-    console.log(rows)
     return rows;
 }
