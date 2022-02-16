@@ -1,5 +1,5 @@
-import { dbConnect, dbInit } from './utils/databases'
-import { getTodayCoinList } from './lib/coinDatabase';
+import { dbConnect, dbInit } from '../utils/databases'
+import { getTodayCoinList } from './coinDatabase';
 
 const nowDate = new Date();
 const year = nowDate.getFullYear();
@@ -14,15 +14,18 @@ interface coinType {
     targetPrice : Number
 }
 
-(async () => {
+export default async function tradingCoin(){
     const conn = dbInit();
     dbConnect(conn);
 
     const CoinList : any =  await getTodayCoinList(conn, 11);
 
     const coinNameList = CoinList.map((coin : coinType)=> coin.coinMarket);
+
+    
+
     console.log(coinNameList);
 
     conn.end();
-})()
+}
 

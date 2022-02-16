@@ -1,12 +1,12 @@
-import { getCoinList, getDayCandle } from './lib/coin';
-import timer from './utils/timer'
-import { dbConnect, dbInit } from './utils/databases'
+import { getCoinList, getDayCandle } from './coin';
+import timer from '../utils/timer'
+import { dbConnect, dbInit } from '../utils/databases'
 
 
 const K = 0.6;
 
 
-(async () => {
+export default async function checkCoinList(){
     const conn = dbInit();
     dbConnect(conn);
 
@@ -40,5 +40,5 @@ const K = 0.6;
     }
 
     conn.end();
-})();
+};
 
