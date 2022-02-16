@@ -1,7 +1,7 @@
-import { getCoinList, getDayCandle } from './coin';
+import { getCoinList, getDayCandle } from '../lib/coin';
 import timer from '../utils/timer'
 import { dbConnect, dbInit } from '../utils/databases'
-
+import { getTodayCoinList } from '../lib/coinDatabase';
 
 const K = 0.6;
 
@@ -37,6 +37,10 @@ export default async function checkCoinList(){
             if (err) console.log('query is not excuted. insert fail...\n' + err);
             else console.log(`insert ${params.join(', ')} success`);
         })
+
+        const CoinList: any = await getTodayCoinList(conn, 11);
+        
+        return CoinList;
     }
 
     conn.end();
