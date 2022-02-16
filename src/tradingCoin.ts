@@ -9,8 +9,8 @@ interface coinType {
     targetPrice: Number
 }
 
-export default async function tradingCoin(){
-    
+export default async function tradingCoin(coinList : coinType[]){
+    console.log(coinList)
     return false;
 }
 

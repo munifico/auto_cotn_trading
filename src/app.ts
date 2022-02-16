@@ -8,15 +8,15 @@ import sellingCoin from './sellingCoin';
 const app = express();
 
 let buyCoinName : string | boolean = false;
-let candidateCoinsBuy = [];
+let candidateCoinsBuy : any = [];
 
-let checkCoinListJob = new CronJob.CronJob('* 0 23 * * *', () => {
-    checkCoinList();
+let checkCoinListJob = new CronJob.CronJob('0 42 23 * * *', async () => {
+    candidateCoinsBuy = await checkCoinList();
 }, null, true)
 
 let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-8 * * *', async () => {
     if(!buyCoinName){
-        buyCoinName = await tradingCoin();
+        buyCoinName = await tradingCoin(candidateCoinsBuy);
     }else{
         buyCoinName = await sellingCoin();
     }
