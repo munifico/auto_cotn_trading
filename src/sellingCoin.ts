@@ -1,17 +1,14 @@
-import { dbConnect, dbInit } from '../database/databases'
-import { getTodayCoinList } from '../database/coinDatabase';
+import { getDayCandle, getMinuteCandle } from '../api/coin';
 
-interface coinType {
-    id: string,
-    coinDate: Date,
-    coinMarket: string,
-    volume: number,
-    targetPrice: number
-}
 
-export default async function sellingCoin(){
-    console.log("selling")
+export default async function sellingCoin(coin : string){
+    const dayCandle = await getMinuteCandle(coin, 10)
+    const MALine = dayCandle.reduce((pre,curr) => pre += curr.trade_price , 0) / 10;
 
-    return true;
+    console.log(MALine);
+
+
+
+    return coin;
 }
 
