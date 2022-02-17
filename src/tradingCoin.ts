@@ -4,19 +4,20 @@ interface coinType {
     id: string,
     coinDate: Date,
     coinMarket: string,
-    volume: Number,
-    targetPrice: Number
+    volume: number,
+    targetPrice: number
 }
 
 export default async function tradingCoin(coinList : coinType[]){
     const coinName = coinList.map(coin => coin.coinMarket);
     const {trade_price : nowPrices} = await getNowPrice(coinName);
-    const buyCoin = false;
+    let buyCoin : boolean | string = false;
 
-    coinList.forEach((coin : coinType, index : Number) => {
+    coinList.forEach((coin : coinType, index : number) => {
         if(nowPrices >= coin.targetPrice){
             //매수코드
             console.log(coin.coinMarket, ':' ,nowPrices , ' buy $.$')
+            buyCoin = coin.coinMarket;
             return buyCoin;
         }
 
