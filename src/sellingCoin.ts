@@ -1,5 +1,5 @@
-import { dbConnect, dbInit } from '../utils/databases'
-import { getTodayCoinList } from '../lib/coinDatabase';
+import { dbConnect, dbInit } from '../database/databases'
+import { getTodayCoinList } from '../database/coinDatabase';
 
 interface coinType {
     id: string,

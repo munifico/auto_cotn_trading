@@ -1,5 +1,6 @@
-import { dbConnect, dbInit } from '../utils/databases'
-import { getTodayCoinList } from '../lib/coinDatabase';
+import { dbConnect, dbInit } from '../database/databases'
+import { getTodayCoinList } from '../database/coinDatabase';
+import { getNowPrice } from '../api/coin';
 
 interface coinType {
     id: string,
@@ -10,7 +11,18 @@ interface coinType {
 }
 
 export default async function tradingCoin(coinList : coinType[]){
-    console.log(coinList)
+    const coinName = coinList.map(coin => coin.coinMarket);
+    const {trade_price : nowPrices} = await getNowPrice(coinName);
+    const buyCoin = false;
+
+    coinList.forEach((coin : coinType, index : Number) => {
+        if(nowPrices >= coin.targetPrice){
+            //매수코드
+            console.log(coin.coinMarket, ':' ,nowPrices , ' buy $.$')
+            return buyCoin;
+        }
+
+    })
     return false;
 }
 
