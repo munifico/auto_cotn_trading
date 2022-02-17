@@ -7,19 +7,26 @@ import sellingCoin from './sellingCoin';
 
 const app = express();
 
-let buyCoinName : string | boolean = false;
-let candidateCoinsBuy : any = [];
+let buyCoinName: string | boolean = false;
+let candidateCoinsBuy: any = [];
 
 let checkCoinListJob = new CronJob.CronJob('* 0 9 * * *', async () => {
-    candidateCoinsBuy = await checkCoinList();
+    try {
+        candidateCoinsBuy = await checkCoinList();
+    } catch (e) {
+        console.error(e)
+    }
 }, null, true)
 
 let tradingSellingCoinJob = new CronJob.CronJob('* 0 10-23,0-9 * * *', async () => {
-    if(!buyCoinName){
-        buyCoinName = await tradingCoin(candidateCoinsBuy);
-    }else{
-        buyCoinName = await sellingCoin();
+    try {
+        if (!buyCoinName) {
+            buyCoinName = await tradingCoin(candidateCoinsBuy);
+        } else {
+            buyCoinName = await sellingCoin();
+        }
+    } catch (e) {
+        console.error(e)
     }
-    
 }, null, true)
 
