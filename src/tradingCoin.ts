@@ -1,5 +1,3 @@
-import { dbConnect, dbInit } from '../database/databases'
-import { getTodayCoinList } from '../database/coinDatabase';
 import { getNowPrice } from '../api/coin';
 
 interface coinType {
