@@ -5,7 +5,7 @@ import { AxiosRequestConfig } from 'axios';
 import { MinuteCandle, DayCandle } from '../types/upbitResposeType';
 
 
-export async function getCoinList(): Promise<MarketInfo> {
+export async function getCoinList(): Promise<MarketInfo[]> {
     const res = await upbitAPIClient.get(GET_COIN_LIST)
     return res.data;
 }
@@ -22,7 +22,7 @@ export async function getDayCandle(market: string, count: number): Promise<DayCa
     return res.data;
 }
 
-export async function getNowPrice(coinList: string[]): Promise<NowPrice> {
+export async function getNowPrice(coinList: string[]): Promise<NowPrice[]> {
     const config: AxiosRequestConfig = {
         params: {
             markets: coinList.join("%2C%20")

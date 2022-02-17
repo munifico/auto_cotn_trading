@@ -1,3 +1,4 @@
+import { MarketInfo } from './../types/upbitResposeType';
 import { getCoinList, getDayCandle } from '../api/coin';
 import timer from '../utils/timer'
 import { dbConnect, dbInit } from '../database/databases'
@@ -10,7 +11,7 @@ export default async function checkCoinList() {
     const conn = dbInit();
     dbConnect(conn);
 
-    let coinList: Array<any> = await getCoinList();
+    let coinList = await getCoinList();
     for (const coin of coinList) {
         await timer(0.25);
         let candles = await getDayCandle(coin.market, 2);
