@@ -1,9 +1,9 @@
-import { getDayCandle, getMinuteCandle, getMyAccount } from '../api/coin';
+import { getMyAccount } from '../api/coin';
+import { makeMALine } from '../utils/coinUtil';
 
 
 export default async function sellingCoin(coin : string){
-    const dayCandle = await getMinuteCandle(coin, 10);
-    const MALine = dayCandle.reduce((pre,curr) => pre += curr.trade_price , 0) / 10;
+    const MALine = await makeMALine(coin)
     const myAccount = await getMyAccount();
 
     console.log(myAccount);

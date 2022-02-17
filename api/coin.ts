@@ -1,9 +1,11 @@
+import { makeToken } from './../constants/upbitAPIOption';
 import { NowPrice, MarketInfo } from './../types/upbitResposeType';
 import { GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_MY_ACCOUNT, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
 import upbitAPIClient from './upbitAPIClient';
 import { AxiosRequestConfig } from 'axios';
 import { MinuteCandle, DayCandle } from '../types/upbitResposeType';
-import { token } from '../constants/upbitAPIOption';
+import { v4 } from 'uuid'
+import { sign } from 'jsonwebtoken'
 
 
 export async function getCoinList(): Promise<MarketInfo[]> {
@@ -47,8 +49,9 @@ export async function getMinuteCandle(market: string, count: number): Promise<Mi
 
 export async function getMyAccount() {
     const config = {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: {Authorization: `Bearer ${makeToken()}`},
     }
 
-    const res = await upbitAPIClient.get(GET_MY_ACCOUNT, config)
+    const res = await upbitAPIClient.get(GET_MY_ACCOUNT, config);
+    return res.data
 }
