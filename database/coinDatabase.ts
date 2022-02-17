@@ -14,6 +14,30 @@ export async function getTodayCoinList(conn: Connection, limit: number) {
     let day = date.getDate() - 1;
 
 
-    const [rows,fields] = await promisePoll.query(sql, [year, month, day, limit]);
+    const [rows, fields] = await promisePoll.query(sql, [year, month, day, limit]);
     return rows;
+}
+
+export async function insertCoinList(
+    conn: Connection,
+    primary_key: string,
+    date: string,
+    market: string,
+    volume: Number,
+    targetPrice: Number,
+    rangePer: Number
+) {
+
+    const params = [
+        primary_key, date, market, volume, targetPrice, rangePer
+    ]
+    const sql = `INSERT 
+        INTO coinAutoTrading.coinList 
+        (id, coinDate, coinMarket, volume, targetPrice, rangePer) VALUES 
+        (?, ?, ?, ?, ?, ?);`
+    conn.query(sql, params, (err) => {
+        if (err) console.log('query is not excuted. insert fail...\n' + err);
+        else console.log(`insert ${params.join(', ')} success`);
+    })
+
 }
