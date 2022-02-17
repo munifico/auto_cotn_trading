@@ -1,8 +1,9 @@
 import { NowPrice, MarketInfo } from './../types/upbitResposeType';
-import { GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
+import { GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_MY_ACCOUNT, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
 import upbitAPIClient from './upbitAPIClient';
 import { AxiosRequestConfig } from 'axios';
 import { MinuteCandle, DayCandle } from '../types/upbitResposeType';
+import { token } from '../constants/upbitAPIOption';
 
 
 export async function getCoinList(): Promise<MarketInfo[]> {
@@ -41,8 +42,13 @@ export async function getMinuteCandle(market: string, count: number): Promise<Mi
     };
     const res = await upbitAPIClient.get(GET_MINUTE_CANDLE, config);
 
-    // const MALine = res.data
-    //     .map((candle : Candle) => candle.opening_price)
-    //     .reduce((pre : number, curr : number) => pre + curr,0) / count
     return res.data;
+}
+
+export async function getMyAccount() {
+    const config = {
+        headers: {Authorization: `Bearer ${token}`},
+    }
+
+    const res = await upbitAPIClient.get(GET_MY_ACCOUNT, config)
 }

@@ -1,4 +1,5 @@
 import { getMinuteCandle, getNowPrice } from '../api/coin';
+import { makeMALine } from '../utils/coinUtil';
 
 interface coinType {
     id: string,
@@ -15,15 +16,15 @@ export default async function tradingCoin(coinList: coinType[]) {
 
     let buyCoin: string = '';
 
-    coinList.forEach(async (coin: coinType, index: number) => {
-        if (nowPrice[index].opening_price >= coin.targetPrice) {
-            //매수코드
+    for (let [index, coin] of coinList.entries()) {
+        if (nowPrice[index].opening_price >= coin.targetPrice &&
+            await makeMALine(coin.coinMarket) < nowPrice[index].opening_price) {
             console.log(coin.coinMarket, ':', nowPrice[index].opening_price, ' buy $.$')
             buyCoin = coin.coinMarket;
             return buyCoin;
         }
-
-    })
-    return buyCoin;
+    }
+    console.log('notbuy')
+    return '';
 }
 

@@ -36,7 +36,7 @@ export async function insertCoinList(
         (id, coinDate, coinMarket, volume, targetPrice, rangePer) VALUES 
         (?, ?, ?, ?, ?, ?);`
     conn.query(sql, params, (err) => {
-        if (err) console.log('query is not excuted. insert fail...\n' + err);
+        if (err) console.error('query is not excuted. insert fail...\n' + err);
         else console.log(`insert ${params.join(', ')} success`);
     })
 
