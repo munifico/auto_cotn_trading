@@ -5,8 +5,8 @@ interface coinType {
     id: string,
     coinDate: Date,
     coinMarket: string,
-    volume: Number,
-    targetPrice: Number
+    volume: number,
+    targetPrice: number
 }
 
 export default async function sellingCoin(){

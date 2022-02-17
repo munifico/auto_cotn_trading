@@ -21,11 +21,11 @@ export async function getTodayCoinList(conn: Connection, limit: number) {
 export async function insertCoinList(
     conn: Connection,
     primary_key: string,
-    date: string,
+    date: Date,
     market: string,
-    volume: Number,
-    targetPrice: Number,
-    rangePer: Number
+    volume: number,
+    targetPrice: number,
+    rangePer: number
 ) {
 
     const params = [
