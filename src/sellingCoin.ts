@@ -10,19 +10,8 @@ interface coinType {
 }
 
 export default async function sellingCoin(){
-    const conn = dbInit();
-    dbConnect(conn);
+    console.log("selling")
 
-    const CoinList: any = await getTodayCoinList(conn, 11);
-
-    const coinNameList = CoinList.map((coin: coinType) => coin.coinMarket);
-
-
-
-    console.log(coinNameList);
-
-    conn.end();
-
-    return false;
+    return true;
 }
 

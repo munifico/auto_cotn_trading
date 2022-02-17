@@ -25,7 +25,7 @@ export async function getDayCandle(market: string, count: number): Promise<DayCa
 export async function getNowPrice(coinList: string[]): Promise<NowPrice[]> {
     const config: AxiosRequestConfig = {
         params: {
-            markets: coinList.join("%2C%20")
+            markets: coinList.join(",")
         },
     };
     const res = await upbitAPIClient.get(GET_NOW_PRICE, config);

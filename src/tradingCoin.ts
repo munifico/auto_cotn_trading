@@ -9,8 +9,10 @@ interface coinType {
 }
 
 export default async function tradingCoin(coinList: coinType[]) {
+    if(coinList.length === 0) throw new Error('CoinList is not update!');
     const coinName = coinList.map(coin => coin.coinMarket);
     const nowPrice = await getNowPrice(coinName);
+    console.log(nowPrice);
     let buyCoin: boolean | string = false;
 
     coinList.forEach((coin: coinType, index: number) => {
@@ -22,6 +24,6 @@ export default async function tradingCoin(coinList: coinType[]) {
         }
 
     })
-    return false;
+    return buyCoin;
 }
 
