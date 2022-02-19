@@ -62,3 +62,12 @@ export interface MarketInfo {
     korean_name: string;
     english_name: string;
 }
+
+export interface AccountInfo{
+    currency: String,
+    balance: String,
+    locked: String,
+    avg_buy_price: String,
+    avg_buy_price_modified: boolean,
+    unit_currency: String
+}

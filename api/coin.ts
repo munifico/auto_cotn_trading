@@ -1,5 +1,5 @@
 import { makeToken } from './../constants/upbitAPIOption';
-import { NowPrice, MarketInfo } from './../types/upbitResposeType';
+import { NowPrice, MarketInfo, AccountInfo } from './../types/upbitResposeType';
 import { GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_MY_ACCOUNT, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
 import upbitAPIClient from './upbitAPIClient';
 import { AxiosRequestConfig } from 'axios';
@@ -47,7 +47,7 @@ export async function getMinuteCandle(market: string, count: number): Promise<Mi
     return res.data;
 }
 
-export async function getMyAccount() {
+export async function getMyAccount() : Promise<AccountInfo[]> {
     const config = {
         headers: {Authorization: `Bearer ${makeToken()}`},
     }
