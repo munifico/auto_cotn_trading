@@ -6,7 +6,7 @@ export default async function sellingCoin(coin: string) {
     const MALine = await makeMALine(coin);
     const sellLine = MALine - (MALine * 0.1);
     const myAccount = await getMyAccount();
-    const [{opening_price : nowPrice}] = await getNowPrice([coin]);
+    const [{trade_price : nowPrice}] = await getNowPrice([coin]);
 
     console.log(myAccount.find(val => val.currency === 'XRP'));
     console.log(MALine);
@@ -14,7 +14,7 @@ export default async function sellingCoin(coin: string) {
 
     // if()
 
-
+   
 
     return coin;
 }
