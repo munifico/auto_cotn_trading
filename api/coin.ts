@@ -1,10 +1,8 @@
-import { POST_BUY_COIN } from './../constants/ubitAPIRoute';
 import { makeToken } from './../constants/upbitAPIOption';
-import { NowPrice, MarketInfo, AccountInfo } from './../types/upbitResposeType';
-import { GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_MY_ACCOUNT, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
+import { POST_OERDER_COIN, GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_MY_ACCOUNT, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
 import upbitAPIClient from './upbitAPIClient';
 import { AxiosRequestConfig } from 'axios';
-import { MinuteCandle, DayCandle } from '../types/upbitResposeType';
+import { NowPrice, MarketInfo, AccountInfo, MinuteCandle, DayCandle } from '../types/upbitResposeType';
 
 
 export async function getCoinList(): Promise<MarketInfo[]> {
@@ -46,25 +44,41 @@ export async function getMinuteCandle(market: string, count: number): Promise<Mi
     return res.data;
 }
 
-export async function getMyAccount() : Promise<AccountInfo[]> {
+export async function getMyAccount(): Promise<AccountInfo[]> {
     const config = {
-        headers: {Authorization: `Bearer ${makeToken()}`},
+        headers: { Authorization: `Bearer ${makeToken()}` },
     }
 
     const res = await upbitAPIClient.get(GET_MY_ACCOUNT, config);
     return res.data
 }
 
-export async function postBuyCoin(market : string, price : string) {
+export async function postBuyCoin(market: string, price: string) {
     const data = {
         market,
         side: 'bid',
         price,
         ord_type: 'price',
     }
-    const config : AxiosRequestConfig = {
-        headers: {Authorization: `Bearer ${makeToken()}`},
+    const config: AxiosRequestConfig = {
+        headers: { Authorization: `Bearer ${makeToken()}` },
         data
     }
-    const res = await upbitAPIClient.get(POST_BUY_COIN, config)
+    const res = await upbitAPIClient.get(POST_OERDER_COIN, config);
+    return res.data
+}
+
+export async function postSellCoin(market: string, volume: string) {
+    const data = {
+        market,
+        side: 'ask',
+        volume,
+        ord_type: 'price',
+    }
+    const config: AxiosRequestConfig = {
+        headers: { Authorization: `Bearer ${makeToken()}` },
+        data
+    }
+    const res = await upbitAPIClient.get(POST_OERDER_COIN, config);
+    return res.data
 }

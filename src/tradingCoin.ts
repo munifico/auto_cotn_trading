@@ -1,4 +1,4 @@
-import { getMinuteCandle, getNowPrice } from '../api/coin';
+import { getNowPrice } from '../api/coin';
 import { makeMALine } from '../utils/coinUtil';
 
 interface coinType {
