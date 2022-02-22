@@ -28,7 +28,6 @@ export default async function tradingCoin(coinList: coinType[]) {
             return buyCoin;
         }
     }
-    console.log('notbuy')
     return '';
 }
 
