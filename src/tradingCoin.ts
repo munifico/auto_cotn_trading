@@ -1,4 +1,4 @@
-import { getNowPrice } from '../api/coin';
+import { getNowPrice, postBuyCoin } from '../api/coin';
 import { makeMALine } from '../utils/coinUtil';
 
 interface coinType {
@@ -19,7 +19,11 @@ export default async function tradingCoin(coinList: coinType[]) {
     for (let [index, coin] of coinList.entries()) {
         if (nowPrice[index].opening_price >= coin.targetPrice &&
             await makeMALine(coin.coinMarket) < nowPrice[index].opening_price) {
-            console.log(coin.coinMarket, ':', nowPrice[index].opening_price, ' buy $.$')
+            postBuyCoin(coin.coinMarket, '1000');
+            
+            console.log(`[매수]${coin.coinMarket} 을(를) ${nowPrice[index].opening_price}원에 매수 하였습니다.`);
+
+
             buyCoin = coin.coinMarket;
             return buyCoin;
         }

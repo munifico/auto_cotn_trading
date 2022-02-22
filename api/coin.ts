@@ -68,7 +68,7 @@ export async function postBuyCoin(market: string, price: string) {
     return res.data
 }
 
-export async function postSellCoin(market: string, volume: string) {
+export async function postSellCoin(market: string, volume: string | undefined) {
     const data = {
         market,
         side: 'ask',

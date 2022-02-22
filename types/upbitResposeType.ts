@@ -64,10 +64,10 @@ export interface MarketInfo {
 }
 
 export interface AccountInfo{
-    currency: String,
-    balance: String,
-    locked: String,
-    avg_buy_price: String,
+    currency: string,
+    balance: string,
+    locked: string,
+    avg_buy_price: string,
     avg_buy_price_modified: boolean,
-    unit_currency: String
+    unit_currency: string
 }
