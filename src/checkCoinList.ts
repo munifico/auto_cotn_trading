@@ -4,7 +4,7 @@ import timer from '../utils/timer'
 import { dbConnect, dbInit } from '../database/databases'
 import { getTodayCoinList, insertCoinList } from '../database/coinDatabase';
 
-const K = 0.6;
+const K = 0.45;
 
 
 export default async function checkCoinList() {

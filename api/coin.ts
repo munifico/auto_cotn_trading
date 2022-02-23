@@ -1,4 +1,4 @@
-import { makeToken } from './../constants/upbitAPIOption';
+import { makePostToken, makeToken } from './../constants/upbitAPIOption';
 import { POST_OERDER_COIN, GET_COIN_LIST, GET_DAY_CANDLE, GET_MINUTE_CANDLE, GET_MY_ACCOUNT, GET_NOW_PRICE } from '../constants/ubitAPIRoute';
 import upbitAPIClient from './upbitAPIClient';
 import { AxiosRequestConfig } from 'axios';
@@ -61,10 +61,9 @@ export async function postBuyCoin(market: string, price: string) {
         ord_type: 'price',
     }
     const config: AxiosRequestConfig = {
-        headers: { Authorization: `Bearer ${makeToken()}` },
-        data
+        headers: { Authorization: `Bearer ${makePostToken(data)}` },
     }
-    const res = await upbitAPIClient.get(POST_OERDER_COIN, config);
+    const res = await upbitAPIClient.post(POST_OERDER_COIN, data, config);
     return res.data
 }
 
@@ -76,9 +75,8 @@ export async function postSellCoin(market: string, volume: string | undefined) {
         ord_type: 'price',
     }
     const config: AxiosRequestConfig = {
-        headers: { Authorization: `Bearer ${makeToken()}` },
-        data
+        headers: { Authorization: `Bearer ${makePostToken(data)}` },
     }
-    const res = await upbitAPIClient.get(POST_OERDER_COIN, config);
+    const res = await upbitAPIClient.post(POST_OERDER_COIN, data, config);
     return res.data
 }
