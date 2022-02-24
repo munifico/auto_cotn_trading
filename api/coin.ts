@@ -72,7 +72,7 @@ export async function postSellCoin(market: string, volume: string | undefined) {
         market,
         side: 'ask',
         volume,
-        ord_type: 'price',
+        ord_type: 'market',
     }
     const config: AxiosRequestConfig = {
         headers: { Authorization: `Bearer ${makePostToken(data)}` },

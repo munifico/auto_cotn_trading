@@ -4,7 +4,7 @@ import CronJob from 'cron';
 import checkCoinList from './checkCoinList';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
-import { getNowPrice } from '../api/coin';
+import { getMyAccount, getNowPrice, postBuyCoin, postSellCoin } from '../api/coin';
 
 
 const app = express();
@@ -12,7 +12,7 @@ const app = express();
 let buyCoinName: string = '';
 let candidateCoinsBuy: any = [];
 
-let checkCoinListJob = new CronJob.CronJob('0 31 20 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
     try {
         candidateCoinsBuy = await checkCoinList();
         console.log("today Coin List :", candidateCoinsBuy)

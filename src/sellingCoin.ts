@@ -16,7 +16,8 @@ export default async function sellingCoin(coin: string) {
         nowPrice < lowerLimit) {
             //매수 코드 작성
             if(buyCoinInfo?.balance){
-                postSellCoin(coin, buyCoinInfo?.balance);
+                const [,coinName] = coin.split('-');
+                postSellCoin(coinName, buyCoinInfo?.balance);
             }else{
                 throw new Error('내 계좌에서 해당 코인을 찾을 수 없습니다. 빨리 확인해 주세요');
             }
