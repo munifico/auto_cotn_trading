@@ -1,10 +1,13 @@
+import { slackToken } from './../constants/slackConstants';
 import { TodayCoinList } from './../types/dbResposeType';
 import express from 'express';
 import CronJob from 'cron';
 import checkCoinList from './checkCoinList';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
-import { getMyAccount, getNowPrice, postBuyCoin, postSellCoin } from '../api/coin';
+import { getNowPrice } from '../api/coin';
+import { WebClient } from '@slack/web-api';
+import Slack from 'slack-node';
 
 
 const app = express();
@@ -49,7 +52,7 @@ app.get('/coinList/:market', async (req, res) => {
         const coinInfo = candidateCoinsBuy.find((coin: TodayCoinList) => coin.coinMarket === market);
 
         const [nowPrice] = await getNowPrice([market]);
-        
+
         const moneyRise = coinInfo.targetPrice - nowPrice.trade_price;
         const perRise = moneyRise / nowPrice.trade_price * 100;
         res.send({
@@ -63,5 +66,27 @@ app.get('/coinList/:market', async (req, res) => {
     }
 })
 
+console.log(slackToken)
+const slack = new Slack(slackToken);
 
+
+const send = async (sender : string, message : string) => {
+    slack.api(
+        "chat.postMessage",
+        {
+            text: `${sender}:\n${message}`,
+            channel: "#coin",
+            icon_emoji: "slack",
+        },
+        (error, response) => {
+            if (error) {
+                console.log(error);
+                return;
+            }
+            console.log(response);
+        }
+    );
+};
+
+send('user1', 'send message')
 app.listen(9999, () => console.log("승재 코인 API시작 :)"));
