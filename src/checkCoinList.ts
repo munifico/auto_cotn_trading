@@ -1,16 +1,12 @@
-import { MarketInfo } from './../types/upbitResposeType';
+import { Connection, RowDataPacket } from 'mysql2';
 import { getCoinList, getDayCandle } from '../api/coin';
 import timer from '../utils/timer'
-import { dbConnect, dbInit } from '../database/databases'
-import { getTodayCoinList, insertCoinList } from '../database/coinDatabase';
+import { insertCoinList } from '../database/coinDatabase';
 
-const K = 0.45;
+let K = 0.45;
 
 
-export default async function checkCoinList() {
-    const conn = dbInit();
-    dbConnect(conn);
-
+export default async function checkCoinList(conn: Connection) {
     let coinList = await getCoinList();
     for (const coin of coinList) {
         await timer(0.25);
@@ -31,12 +27,6 @@ export default async function checkCoinList() {
             targetPrice,
             rangePer
         )
-
     }
-    const CoinList = await getTodayCoinList(conn, 11);
-    
-    conn.end();
-
-    return CoinList;
 };
 

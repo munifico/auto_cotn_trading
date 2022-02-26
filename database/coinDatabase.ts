@@ -18,26 +18,25 @@ export async function getTodayCoinList(conn: Connection, limit: number) {
     return rows;
 }
 
+
 export async function insertCoinList(
     conn: Connection,
-    primary_key: string,
-    date: Date,
-    market: string,
+    id: string,
+    coinDate: Date,
+    coinMarket: string,
     volume: number,
     targetPrice: number,
     rangePer: number
 ) {
 
     const params = [
-        primary_key, date, market, volume, targetPrice, rangePer
+        id, coinDate, coinMarket, volume, targetPrice, rangePer
     ]
     const sql = `INSERT 
         INTO coinAutoTrading.coinList 
         (id, coinDate, coinMarket, volume, targetPrice, rangePer) VALUES 
         (?, ?, ?, ?, ?, ?);`
     conn.query(sql, params, (err) => {
-        if (err) console.error('query is not excuted. insert fail...\n' + err);
-        else console.log(`insert ${params.join(', ')} success`);
+        if (err) console.error('[insertCoinList] err\n' + err);
     })
-
 }

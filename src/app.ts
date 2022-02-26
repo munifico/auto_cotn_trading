@@ -1,4 +1,3 @@
-import { slackToken } from './../constants/slackConstants';
 import { TodayCoinList } from './../types/dbResposeType';
 import express from 'express';
 import CronJob from 'cron';
@@ -6,19 +5,22 @@ import checkCoinList from './checkCoinList';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
 import { getNowPrice } from '../api/coin';
-import { WebClient } from '@slack/web-api';
-import Slack from 'slack-node';
+import { slackSend } from '../api/slack';
+import { dbConnect, dbInit } from '../database/databases';
+import { getTodayCoinList } from '../database/coinDatabase';
+import { RowDataPacket } from 'mysql2';
+
 
 
 const app = express();
+const conn = dbInit();
+dbConnect(conn)
 
 let buyCoinName: string = '';
-let candidateCoinsBuy: any = [];
 
 let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
     try {
-        candidateCoinsBuy = await checkCoinList();
-        console.log("today Coin List :", candidateCoinsBuy)
+        await checkCoinList(conn);
     } catch (e) {
         console.error(e)
     }
@@ -26,8 +28,9 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
 
 let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
     try {
+        const candidateCoinsBuy = await getTodayCoinList(conn, 11)
         if (buyCoinName === '') {
-            buyCoinName = await tradingCoin(candidateCoinsBuy);
+            buyCoinName = await tradingCoin(candidateCoinsBuy as TodayCoinList[]);
         } else {
             buyCoinName = await sellingCoin(buyCoinName);
         }
@@ -36,7 +39,8 @@ let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () 
     }
 }, null, true);
 
-app.get('/todayCoinList', (req, res) => {
+app.get('/todayCoinList', async (req, res) => {
+    const candidateCoinsBuy = await getTodayCoinList(conn, 11)
     res.send(candidateCoinsBuy);
     console.log('/todayCoinList 호출');
 })
@@ -48,12 +52,18 @@ app.get('/buyCoin', (req, res) => {
 
 app.get('/coinList/:market', async (req, res) => {
     try {
+        const candidateCoinsBuy = await getTodayCoinList(conn, 11);
         const market = req.params.market;
-        const coinInfo = candidateCoinsBuy.find((coin: TodayCoinList) => coin.coinMarket === market);
+        const coinInfo = (candidateCoinsBuy as TodayCoinList[]).find((coin: TodayCoinList) => coin.coinMarket === market);
 
         const [nowPrice] = await getNowPrice([market]);
 
-        const moneyRise = coinInfo.targetPrice - nowPrice.trade_price;
+        if(coinInfo?.targetPrice){
+            res.send("오늘의 코인에는 포함되지 않는 코인입니다");
+            return;
+        }
+
+        const moneyRise = (coinInfo as TodayCoinList)?.targetPrice - nowPrice.trade_price;
         const perRise = moneyRise / nowPrice.trade_price * 100;
         res.send({
             coinInfo,
@@ -66,27 +76,4 @@ app.get('/coinList/:market', async (req, res) => {
     }
 })
 
-console.log(slackToken)
-const slack = new Slack(slackToken);
-
-
-const send = async (sender : string, message : string) => {
-    slack.api(
-        "chat.postMessage",
-        {
-            text: `${sender}:\n${message}`,
-            channel: "#coin",
-            icon_emoji: "slack",
-        },
-        (error, response) => {
-            if (error) {
-                console.log(error);
-                return;
-            }
-            console.log(response);
-        }
-    );
-};
-
-send('user1', 'send message')
 app.listen(9999, () => console.log("승재 코인 API시작 :)"));
