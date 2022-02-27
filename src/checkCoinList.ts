@@ -1,4 +1,4 @@
-import { Connection, RowDataPacket } from 'mysql2';
+import { Connection } from 'mysql2';
 import { getCoinList, getDayCandle } from '../api/coin';
 import timer from '../utils/timer'
 import { insertCoinList } from '../database/coinDatabase';
@@ -25,7 +25,8 @@ export default async function checkCoinList(conn: Connection) {
             coinCandle.market,
             volume,
             targetPrice,
-            rangePer
+            rangePer,
+            todayCoinCandle.opening_price
         )
     }
 };

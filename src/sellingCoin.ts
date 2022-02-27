@@ -1,4 +1,5 @@
 import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
+import { slackSend } from '../api/slack';
 import { makeMALine } from '../utils/coinUtil';
 
 
@@ -22,6 +23,7 @@ export default async function sellingCoin(coin: string) {
                 throw new Error('내 계좌에서 해당 코인을 찾을 수 없습니다. 빨리 확인해 주세요');
             }
             
+            slackSend(`[매도]${coin} 을(를) ${nowPrice}원에 매매 하였습니다.`);
             console.log(`[매도]${coin} 을(를) ${nowPrice}원에 매매 하였습니다.`);
     }
 

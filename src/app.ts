@@ -18,7 +18,7 @@ dbConnect(conn)
 
 let buyCoinName: string = '';
 
-let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 43 20 * * *', async () => {
     try {
         await checkCoinList(conn);
     } catch (e) {
@@ -28,7 +28,7 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
 
 let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
     try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, 11)
+        const candidateCoinsBuy = await getTodayCoinList(conn, 20)
         if (buyCoinName === '') {
             buyCoinName = await tradingCoin(candidateCoinsBuy as TodayCoinList[]);
         } else {
@@ -40,7 +40,7 @@ let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () 
 }, null, true);
 
 app.get('/todayCoinList', async (req, res) => {
-    const candidateCoinsBuy = await getTodayCoinList(conn, 11)
+    const candidateCoinsBuy = await getTodayCoinList(conn, 20)
     res.send(candidateCoinsBuy);
     console.log('/todayCoinList 호출');
 })
@@ -52,13 +52,15 @@ app.get('/buyCoin', (req, res) => {
 
 app.get('/coinList/:market', async (req, res) => {
     try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, 11);
+        const candidateCoinsBuy = await getTodayCoinList(conn, 20);
         const market = req.params.market;
         const coinInfo = (candidateCoinsBuy as TodayCoinList[]).find((coin: TodayCoinList) => coin.coinMarket === market);
 
         const [nowPrice] = await getNowPrice([market]);
 
-        if(coinInfo?.targetPrice){
+        console.log(coinInfo);
+
+        if(!coinInfo?.targetPrice){
             res.send("오늘의 코인에는 포함되지 않는 코인입니다");
             return;
         }

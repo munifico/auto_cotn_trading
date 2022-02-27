@@ -3,18 +3,14 @@ import { Connection, Query } from "mysql2";
 export async function getTodayCoinList(conn: Connection, limit: number) {
     const sql = `SELECT t.*
     FROM coinAutoTrading.coinList t
-    WHERE coinDate = "?-?-?T09:00:00"
-    ORDER BY rangePer DESC
+    ORDER BY coinDate DESC, rangePer DESC
     LIMIT ?`
 
     const promisePoll = conn.promise();
     const date = new Date();
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate() - 1;
 
 
-    const [rows, fields] = await promisePoll.query(sql, [year, month, day, limit]);
+    const [rows, fields] = await promisePoll.query(sql, [limit]);
     return rows;
 }
 
@@ -26,17 +22,19 @@ export async function insertCoinList(
     coinMarket: string,
     volume: number,
     targetPrice: number,
-    rangePer: number
+    rangePer: number,
+    openingPrice : number
 ) {
 
     const params = [
-        id, coinDate, coinMarket, volume, targetPrice, rangePer
+        id, coinDate, coinMarket, volume, targetPrice, rangePer, openingPrice
     ]
     const sql = `INSERT 
         INTO coinAutoTrading.coinList 
-        (id, coinDate, coinMarket, volume, targetPrice, rangePer) VALUES 
-        (?, ?, ?, ?, ?, ?);`
+        (id, coinDate, coinMarket, volume, targetPrice, rangePer, openingPrice) VALUES 
+        (?, ?, ?, ?, ?, ?, ?);`
     conn.query(sql, params, (err) => {
         if (err) console.error('[insertCoinList] err\n' + err);
+        else console.log('[insertCoinList] insert')
     })
 }
