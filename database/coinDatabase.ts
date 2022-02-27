@@ -23,7 +23,7 @@ export async function insertCoinList(
     volume: number,
     targetPrice: number,
     rangePer: number,
-    openingPrice : number
+    openingPrice: number
 ) {
 
     const params = [
@@ -36,5 +36,20 @@ export async function insertCoinList(
     conn.query(sql, params, (err) => {
         if (err) console.error('[insertCoinList] err\n' + err);
         else console.log('[insertCoinList] insert')
+    })
+}
+
+export async function updateTargetPrice(
+    conn: Connection,
+    id: string,
+    targetPrice: number
+) {
+    const params = [
+        targetPrice, id
+    ]
+    const sql = `UPDATE coinAutoTrading.coinList t SET t.targetPrice = ? WHERE t.id = ?;`
+    conn.query(sql, params, (err) => {
+        if (err) console.error('[updateTargetPrice] err\n' + err);
+        else console.log('[updateTargetPrice] update')
     })
 }

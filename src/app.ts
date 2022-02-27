@@ -7,12 +7,16 @@ import sellingCoin from './sellingCoin';
 import { getNowPrice } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
-import { getTodayCoinList } from '../database/coinDatabase';
+import { getTodayCoinList, updateTargetPrice } from '../database/coinDatabase';
 import { RowDataPacket } from 'mysql2';
 
 
 
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const conn = dbInit();
 dbConnect(conn)
 
@@ -50,17 +54,19 @@ app.get('/buyCoin', (req, res) => {
     console.log('buyCoin 호출');
 });
 
-app.get('/coinList/:market', async (req, res) => {
+app.get('/coinState', async (req, res) => {
     try {
         const candidateCoinsBuy = await getTodayCoinList(conn, 20);
-        const market = req.params.market;
+        const market = req.query.market;
+
+
         const coinInfo = (candidateCoinsBuy as TodayCoinList[]).find((coin: TodayCoinList) => coin.coinMarket === market);
 
-        const [nowPrice] = await getNowPrice([market]);
+        const [nowPrice] = await getNowPrice([market as string]);
 
         console.log(coinInfo);
 
-        if(!coinInfo?.targetPrice){
+        if (!coinInfo?.targetPrice) {
             res.send("오늘의 코인에는 포함되지 않는 코인입니다");
             return;
         }
@@ -76,6 +82,19 @@ app.get('/coinList/:market', async (req, res) => {
         console.log(error);
         res.send(error);
     }
+})
+
+
+
+app.patch('/ResettingK', async (res, req) => {
+    const { k } = res.body;
+    const candidateCoinsBuy = await getTodayCoinList(conn, 20);
+    (candidateCoinsBuy as TodayCoinList[]).forEach(coin => {
+        const targetPrice = coin.openingPrice + coin.volume * k;
+        updateTargetPrice(conn, coin.id, targetPrice);   
+    })
+    req.send('k값 설정 완료하였습니다.');
+    slackSend(`K값 변경 ${k}`)
 })
 
 app.listen(9999, () => console.log("승재 코인 API시작 :)"));

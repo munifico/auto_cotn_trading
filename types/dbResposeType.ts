@@ -5,4 +5,5 @@ export interface TodayCoinList {
     volume: number;
     targetPrice: number;
     rangePer: number;
+    openingPrice: number;
 }
