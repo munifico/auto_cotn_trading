@@ -9,12 +9,14 @@ export default async function sellingCoin(coin: string) {
     const myAccount = await getMyAccount();
     const buyCoinInfo = myAccount.find(val => val.currency === coin);
     const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.02;
+    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.05;
 
 
     const [{ trade_price: nowPrice }] = await getNowPrice([coin]);
 
     if (nowPrice < sellLine ||
-        nowPrice < lowerLimit) {
+        nowPrice < lowerLimit ||
+        nowPrice > upperLimit) {
             //매수 코드 작성
             if(buyCoinInfo?.balance){
                 const [,coinName] = coin.split('-');

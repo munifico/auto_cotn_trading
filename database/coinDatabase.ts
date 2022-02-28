@@ -2,7 +2,7 @@ import { Connection, Query } from "mysql2";
 
 export async function getTodayCoinList(conn: Connection, limit: number) {
     const sql = `SELECT t.*
-    FROM coinAutoTrading.coinList t
+    FROM coinAutoTrading.coinList t WHERE coinMarket LIKE 'KRW-%'
     ORDER BY coinDate DESC, rangePer DESC
     LIMIT ?`
 
@@ -39,7 +39,7 @@ export async function insertCoinList(
     })
 }
 
-export async function updateTargetPrice(
+export function updateTargetPrice(
     conn: Connection,
     id: string,
     targetPrice: number

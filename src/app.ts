@@ -1,14 +1,14 @@
+import { TODAY_COIN_LENGTH } from './../constants/coinConstants';
 import { TodayCoinList } from './../types/dbResposeType';
 import express from 'express';
 import CronJob from 'cron';
 import checkCoinList from './checkCoinList';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
-import { getNowPrice } from '../api/coin';
+import { getNowPrice, postBuyCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
 import { getTodayCoinList, updateTargetPrice } from '../database/coinDatabase';
-import { RowDataPacket } from 'mysql2';
 
 
 
@@ -22,7 +22,7 @@ dbConnect(conn)
 
 let buyCoinName: string = '';
 
-let checkCoinListJob = new CronJob.CronJob('0 43 20 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 9 22 * * *', async () => {
     try {
         await checkCoinList(conn);
     } catch (e) {
@@ -30,9 +30,11 @@ let checkCoinListJob = new CronJob.CronJob('0 43 20 * * *', async () => {
     }
 }, null, true)
 
+
+
 let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
     try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, 20)
+        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH)
         if (buyCoinName === '') {
             buyCoinName = await tradingCoin(candidateCoinsBuy as TodayCoinList[]);
         } else {
@@ -43,8 +45,9 @@ let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () 
     }
 }, null, true);
 
+
 app.get('/todayCoinList', async (req, res) => {
-    const candidateCoinsBuy = await getTodayCoinList(conn, 20)
+    const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH)
     res.send(candidateCoinsBuy);
     console.log('/todayCoinList 호출');
 })
@@ -56,7 +59,7 @@ app.get('/buyCoin', (req, res) => {
 
 app.get('/coinState', async (req, res) => {
     try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, 20);
+        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
         const market = req.query.market;
 
 
@@ -85,10 +88,9 @@ app.get('/coinState', async (req, res) => {
 })
 
 
-
 app.patch('/ResettingK', async (res, req) => {
     const { k } = res.body;
-    const candidateCoinsBuy = await getTodayCoinList(conn, 20);
+    const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
     (candidateCoinsBuy as TodayCoinList[]).forEach(coin => {
         const targetPrice = coin.openingPrice + coin.volume * k;
         updateTargetPrice(conn, coin.id, targetPrice);   
