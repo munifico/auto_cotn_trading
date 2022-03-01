@@ -1,9 +1,11 @@
+import { Connection } from 'mysql2';
 import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
+import { updateTradingList } from '../database/coinDatabase';
 import { makeMALine } from '../utils/coinUtil';
 
 
-export default async function sellingCoin(coin: string) {
+export default async function sellingCoin(conn : Connection,coin: string) {
     const MALine = await makeMALine(coin);
     const sellLine = MALine - (MALine * 0.01);
     const myAccount = await getMyAccount();
@@ -20,13 +22,14 @@ export default async function sellingCoin(coin: string) {
             //매수 코드 작성
             if(buyCoinInfo?.balance){
                 const [,coinName] = coin.split('-');
-                postSellCoin(coinName, buyCoinInfo?.balance);
+                const res = await postSellCoin(coinName, buyCoinInfo?.balance);
+                updateTradingList(conn, coin , res.created_at, nowPrice);
             }else{
                 throw new Error('내 계좌에서 해당 코인을 찾을 수 없습니다. 빨리 확인해 주세요');
             }
             
-            slackSend(`[매도]${coin} 을(를) ${nowPrice}원에 매매 하였습니다.`);
-            console.log(`[매도]${coin} 을(를) ${nowPrice}원에 매매 하였습니다.`);
+            slackSend(`[매도]${coin} 을(를) ${nowPrice}에 매매 하였습니다.`);
+            console.log(`[매도]${coin} 을(를) ${nowPrice}에 매매 하였습니다.`);
     }
 
 

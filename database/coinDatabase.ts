@@ -53,3 +53,48 @@ export function updateTargetPrice(
         else console.log('[updateTargetPrice] update')
     })
 }
+
+export function insertTradingList(
+    conn: Connection,
+    id : string,
+    buyDate : string,
+    market : string,
+    buyPrice : number
+){
+
+    const params = [
+        id, buyDate, market, buyPrice
+    ];
+    const sql = `INSERT INTO 
+        coinAutoTrading.tradingList (c_id, buyDate, market, buyPrice) 
+        VALUES (? ,?, ?, ?)`;
+    conn.query(sql,params, (err) => {
+        if (err) console.error('[insertTradingList] err\n' + err);
+        else console.log('[insertTradingList] update')
+    })
+}
+
+export function updateTradingList(
+    conn: Connection,
+    id : string,
+    sellDate : string,
+    sellPrice : number
+){
+
+    const params = [
+        sellDate, sellPrice
+    ];
+    const sql = `UPDATE coinAutoTrading.tradingList t 
+                 SET t.sellDate = ? , t.sellPrice = ? 
+                 WHERE c_id LIKE '%${id}' AND sellPrice IS NULL`;
+    conn.query(sql,params, (err) => {
+        if (err) console.error('[updateTradingList] err\n' + err);
+        else console.log('[updateTradingList] update')
+    })
+}
+
+// export function getNowBuyCoin(
+//     conn: Connection
+// ){
+//     const sql = `SELECT * from coinAutoTrading.tradingList t WHERE sellPrice is NULL`
+// }

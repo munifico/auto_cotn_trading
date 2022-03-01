@@ -8,7 +8,7 @@ import sellingCoin from './sellingCoin';
 import { getNowPrice, postBuyCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
-import { getTodayCoinList, updateTargetPrice } from '../database/coinDatabase';
+import { getTodayCoinList, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
 
 
 
@@ -27,6 +27,7 @@ let checkCoinListJob = new CronJob.CronJob('0 9 22 * * *', async () => {
         await checkCoinList(conn);
     } catch (e) {
         console.error(e)
+        slackSend(`[checkCoinListJob] ${e}`);
     }
 }, null, true)
 
@@ -36,15 +37,17 @@ let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () 
     try {
         const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH)
         if (buyCoinName === '') {
-            buyCoinName = await tradingCoin(candidateCoinsBuy as TodayCoinList[]);
+            // buyCoinName = await tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
         } else {
-            buyCoinName = await sellingCoin(buyCoinName);
+            buyCoinName = await sellingCoin(conn,buyCoinName);
         }
     } catch (e) {
         console.error(e)
+        slackSend(`[tradingSellingCoinJob] ${e}`);
     }
 }, null, true);
 
+updateTradingList(conn, 'KRW-NEO', '2022-03-01 22:56:47', 29770);
 
 app.get('/todayCoinList', async (req, res) => {
     const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH)
