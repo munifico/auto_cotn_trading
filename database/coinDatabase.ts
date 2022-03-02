@@ -56,11 +56,11 @@ export function updateTargetPrice(
 
 export function insertTradingList(
     conn: Connection,
-    id : string,
-    buyDate : string,
-    market : string,
-    buyPrice : number
-){
+    id: string,
+    buyDate: string,
+    market: string,
+    buyPrice: number
+) {
 
     const params = [
         id, buyDate, market, buyPrice
@@ -68,7 +68,7 @@ export function insertTradingList(
     const sql = `INSERT INTO 
         coinAutoTrading.tradingList (c_id, buyDate, market, buyPrice) 
         VALUES (? ,?, ?, ?)`;
-    conn.query(sql,params, (err) => {
+    conn.query(sql, params, (err) => {
         if (err) console.error('[insertTradingList] err\n' + err);
         else console.log('[insertTradingList] update')
     })
@@ -76,10 +76,10 @@ export function insertTradingList(
 
 export function updateTradingList(
     conn: Connection,
-    id : string,
-    sellDate : string,
-    sellPrice : number
-){
+    id: string,
+    sellDate: string,
+    sellPrice: number
+) {
 
     const params = [
         sellDate, sellPrice
@@ -87,7 +87,7 @@ export function updateTradingList(
     const sql = `UPDATE coinAutoTrading.tradingList t 
                  SET t.sellDate = ? , t.sellPrice = ? 
                  WHERE c_id LIKE '%${id}' AND sellPrice IS NULL`;
-    conn.query(sql,params, (err) => {
+    conn.query(sql, params, (err) => {
         if (err) console.error('[updateTradingList] err\n' + err);
         else console.log('[updateTradingList] update')
     })
@@ -95,11 +95,21 @@ export function updateTradingList(
 
 export async function getNowBuyCoin(
     conn: Connection
-){
+) {
     const sql = `SELECT * from coinAutoTrading.tradingList t WHERE sellPrice is NULL`
     const promisePoll = conn.promise();
 
 
     const [rows, fields] = await promisePoll.query(sql);
+    return rows;
+}
+
+export async function getTradingHistory(conn: Connection, index: number) {
+    const params = [index, index + 5];
+    const sql = `SELECT * from coinAutoTrading.tradingList t ORDER BY t.id LIMIT ?,?`;
+
+    const promisePoll = conn.promise();
+
+    const [rows, fields] = await promisePoll.query(sql, params);
     return rows;
 }

@@ -8,7 +8,7 @@ import sellingCoin from './sellingCoin';
 import { getNowPrice, postBuyCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
-import { getNowBuyCoin, getTodayCoinList, insertTradingList, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
+import { getNowBuyCoin, getTodayCoinList, getTradingHistory, insertTradingList, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
 import { RowDataPacket } from 'mysql2';
 
 
@@ -32,22 +32,22 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
 
 
 
-let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
-    try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
-        let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
-        if (buyCoin.length === 0) {
-            tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
-        } else {
-            buyCoin.forEach(coin => {
-                sellingCoin(conn, coin.market);
-            })
-        }
-    } catch (e) {
-        console.error(e)
-        slackSend(`[tradingSellingCoinJob] ${e}`);
-    }
-}, null, true);
+// let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
+//     try {
+//         const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
+//         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+//         if (buyCoin.length === 0) {
+//             tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
+//         } else {
+//             buyCoin.forEach(coin => {
+//                 sellingCoin(conn, coin.market);
+//             })
+//         }
+//     } catch (e) {
+//         console.error(e)
+//         slackSend(`[tradingSellingCoinJob] ${e}`);
+//     }
+// }, null, true);
 
 
 app.get('/todayCoinList', async (req, res) => {
@@ -96,15 +96,21 @@ app.get('/coinState', async (req, res) => {
 })
 
 
-app.patch('/ResettingK', async (res, req) => {
-    const { k } = res.body;
+app.patch('/ResettingK', async (req, res) => {
+    const { k } = req.body;
     const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
     (candidateCoinsBuy as TodayCoinList[]).forEach(coin => {
         const targetPrice = coin.openingPrice + coin.volume * k;
         updateTargetPrice(conn, coin.id, targetPrice);
     })
-    req.send('k값 설정 완료하였습니다.');
+    res.send('k값 설정 완료하였습니다.');
     slackSend(`K값 변경 ${k}`)
+})
+
+app.get('/tradingHistory', async (req, res) => {
+    const {index} = req.query;
+
+    res.send(await getTradingHistory(conn, Number(index)));
 })
 
 app.listen(9999, () => console.log("승재 코인 API시작 :)"));
