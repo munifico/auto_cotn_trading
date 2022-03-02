@@ -1,3 +1,4 @@
+import { kMaxLength } from 'buffer';
 import { Connection } from 'mysql2';
 import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
@@ -9,12 +10,14 @@ export default async function sellingCoin(conn : Connection,coin: string) {
     const MALine = await makeMALine(coin);
     const sellLine = MALine - (MALine * 0.01);
     const myAccount = await getMyAccount();
-    const buyCoinInfo = myAccount.find(val => val.currency === coin);
+    const buyCoinInfo = myAccount.find(val => val.currency === coin.split('-')[1]);
     const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.02;
-    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.05;
+    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.04;
 
-
+    
     const [{ trade_price: nowPrice }] = await getNowPrice([coin]);
+
+    console.log(nowPrice > upperLimit)
 
     if (nowPrice < sellLine ||
         nowPrice < lowerLimit ||
@@ -22,8 +25,9 @@ export default async function sellingCoin(conn : Connection,coin: string) {
             //매수 코드 작성
             if(buyCoinInfo?.balance){
                 const [,coinName] = coin.split('-');
-                const res = await postSellCoin(coinName, buyCoinInfo?.balance);
-                updateTradingList(conn, coin , res.created_at, nowPrice);
+                console.log(coinName, buyCoinInfo?.balance);
+                const res = await postSellCoin(coin, buyCoinInfo?.balance);
+                updateTradingList(conn, coin , res.created_at.split("+")[0], nowPrice);
             }else{
                 throw new Error('내 계좌에서 해당 코인을 찾을 수 없습니다. 빨리 확인해 주세요');
             }
