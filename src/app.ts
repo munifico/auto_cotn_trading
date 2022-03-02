@@ -8,7 +8,8 @@ import sellingCoin from './sellingCoin';
 import { getNowPrice, postBuyCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
-import { getTodayCoinList, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
+import { getNowBuyCoin, getTodayCoinList, insertTradingList, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
+import { RowDataPacket } from 'mysql2';
 
 
 
@@ -20,9 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 const conn = dbInit();
 dbConnect(conn)
 
-let buyCoinName: string = '';
-
-let checkCoinListJob = new CronJob.CronJob('0 9 22 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
     try {
         await checkCoinList(conn);
     } catch (e) {
@@ -35,11 +34,14 @@ let checkCoinListJob = new CronJob.CronJob('0 9 22 * * *', async () => {
 
 let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
     try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH)
-        if (buyCoinName === '') {
-            // buyCoinName = await tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
+        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
+        let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+        if (buyCoin.length === 0) {
+            tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
         } else {
-            buyCoinName = await sellingCoin(conn,buyCoinName);
+            buyCoin.forEach(coin => {
+                sellingCoin(conn, coin.market);
+            })
         }
     } catch (e) {
         console.error(e)
@@ -47,7 +49,6 @@ let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () 
     }
 }, null, true);
 
-updateTradingList(conn, 'KRW-NEO', '2022-03-01 22:56:47', 29770);
 
 app.get('/todayCoinList', async (req, res) => {
     const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH)
@@ -55,9 +56,13 @@ app.get('/todayCoinList', async (req, res) => {
     console.log('/todayCoinList 호출');
 })
 
-app.get('/buyCoin', (req, res) => {
-    res.send(buyCoinName);
-    console.log('buyCoin 호출');
+app.get('/buyCoin', async (req, res) => {
+    let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+    if(buyCoin.length === 0){
+        res.send("구매한 코인 없습니다.");
+    }else{
+        res.send(buyCoin.map(coin => coin.market).join(', '));
+    }
 });
 
 app.get('/coinState', async (req, res) => {
@@ -96,7 +101,7 @@ app.patch('/ResettingK', async (res, req) => {
     const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
     (candidateCoinsBuy as TodayCoinList[]).forEach(coin => {
         const targetPrice = coin.openingPrice + coin.volume * k;
-        updateTargetPrice(conn, coin.id, targetPrice);   
+        updateTargetPrice(conn, coin.id, targetPrice);
     })
     req.send('k값 설정 완료하였습니다.');
     slackSend(`K값 변경 ${k}`)

@@ -93,8 +93,13 @@ export function updateTradingList(
     })
 }
 
-// export function getNowBuyCoin(
-//     conn: Connection
-// ){
-//     const sql = `SELECT * from coinAutoTrading.tradingList t WHERE sellPrice is NULL`
-// }
+export async function getNowBuyCoin(
+    conn: Connection
+){
+    const sql = `SELECT * from coinAutoTrading.tradingList t WHERE sellPrice is NULL`
+    const promisePoll = conn.promise();
+
+
+    const [rows, fields] = await promisePoll.query(sql);
+    return rows;
+}
