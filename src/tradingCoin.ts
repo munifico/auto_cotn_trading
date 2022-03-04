@@ -22,9 +22,9 @@ export default async function tradingCoin(conn : Connection,coinList: TodayCoinL
 
 
 
-                console.log(`[매수]${coin.coinMarket} 을(를) ${nowPrice[index].opening_price}원에 매수 하였습니다.`);
+                console.log(`[매수]${coin.coinMarket} 을(를) ${nowPrice[index].trade_price}원에 매수 하였습니다.`);
                 insertTradingList(conn, coin.id ,resData.created_at.split('+')[0] , resData.market, nowPrice[index].opening_price);
-                slackSend(`[매수]${coin.coinMarket} 을(를) ${nowPrice[index].opening_price}원에 매수 하였습니다.`);
+                slackSend(`[매수]${coin.coinMarket} 을(를) ${nowPrice[index].trade_price}원에 매수 하였습니다.`);
                 
 
                 buyCoin = coin.coinMarket;

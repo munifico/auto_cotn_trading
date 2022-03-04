@@ -12,12 +12,10 @@ export default async function sellingCoin(conn : Connection,coin: string) {
     const myAccount = await getMyAccount();
     const buyCoinInfo = myAccount.find(val => val.currency === coin.split('-')[1]);
     const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.02;
-    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.04;
+    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.05;
 
     
     const [{ trade_price: nowPrice }] = await getNowPrice([coin]);
-
-    console.log(nowPrice > upperLimit)
 
     if (nowPrice < sellLine ||
         nowPrice < lowerLimit ||

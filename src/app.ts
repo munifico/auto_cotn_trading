@@ -21,17 +21,19 @@ app.use(express.urlencoded({ extended: true }));
 const conn = dbInit();
 dbConnect(conn)
 
-let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 28 22 * * *', async () => {
     try {
-        await checkCoinList(conn);
+        // await checkCoinList(conn);
         const myAccount = await getMyAccount();
 
         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+        
         buyCoin.forEach(async coin => {
             const buyCoinInfo = myAccount.find(val => val.currency === coin.market.split('_')[1]);
             const res = await postSellCoin(coin.market, buyCoinInfo?.balance);
             const [{ trade_price: nowPrice }] = await getNowPrice([coin.market]);
-            updateTradingList(conn, coin.market, res.created_at, nowPrice);
+            updateTradingList(conn, coin.market, res.created_at.split("+")[0], nowPrice);
+            slackSend(`[다음날 매도] ${coin.market}을 ${nowPrice}에 매도 하였습니다.`);
         });
     } catch (e) {
         console.error(e)
@@ -41,22 +43,22 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
 
 
 
-let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
-    try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
-        let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
-        if (buyCoin.length === 0) {
-            tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
-        } else {
-            buyCoin.forEach(coin => {
-                sellingCoin(conn, coin.market);
-            })
-        }
-    } catch (e) {
-        console.error(e)
-        slackSend(`[tradingSellingCoinJob] ${e}`);
-    }
-}, null, true);
+// let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
+//     try {
+//         const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
+//         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+//         if (buyCoin.length === 0) {
+//             tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
+//         } else {
+//             buyCoin.forEach(coin => {
+//                 sellingCoin(conn, coin.market);
+//             })
+//         }
+//     } catch (e) {
+//         console.error(e)
+//         slackSend(`[tradingSellingCoinJob] ${e}`);
+//     }
+// }, null, true);
 
 
 
