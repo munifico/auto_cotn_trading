@@ -5,10 +5,12 @@ import CronJob from 'cron';
 import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
-import { getNowBuyCoin, getTodayCoinList, getTradingHistory, insertTradingList, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
+import { getNowBuyCoin, getTodayCoinList, getTradingHistory, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
 import { RowDataPacket } from 'mysql2';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
+import checkCoinList from './checkCoinList';
+import { makeMALine } from '../utils/coinUtil';
 
 
 
@@ -17,13 +19,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
 const conn = dbInit();
 dbConnect(conn)
 
-let checkCoinListJob = new CronJob.CronJob('0 28 22 * * *', async () => {
+let buyCoinList: string[] = [];
+
+let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
     try {
-        // await checkCoinList(conn);
+        await checkCoinList(conn);
         const myAccount = await getMyAccount();
+
+        buyCoinList = [];
 
         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
         
@@ -47,10 +55,10 @@ let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () 
         const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
         if (buyCoin.length === 0) {
-            tradingCoin(conn, candidateCoinsBuy as TodayCoinList[]);
+            tradingCoin(conn, candidateCoinsBuy as TodayCoinList[], buyCoinList);
         } else {
-            buyCoin.forEach(coin => {
-                sellingCoin(conn, coin.market);
+            buyCoin.forEach(async coin => {
+                buyCoinList.push(await sellingCoin(conn, coin.market));
             })
         }
     } catch (e) {
@@ -124,4 +132,4 @@ app.get('/tradingHistory', async (req, res) => {
     res.send(await getTradingHistory(conn, Number(index)));
 })
 
-app.listen(9999, () => console.log("승재 코인 API시작 :)"));
+app.listen(9999, "localhost", () => console.log("승재 코인 API시작 :)"));
