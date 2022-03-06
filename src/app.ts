@@ -1,3 +1,4 @@
+import { NowPrice } from './../types/upbitResposeType';
 import { TODAY_COIN_LENGTH } from './../constants/coinConstants';
 import { TodayCoinList } from './../types/dbResposeType';
 import express from 'express';
@@ -26,7 +27,7 @@ dbConnect(conn)
 
 let buyCoinList: string[] = [];
 
-let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 30 9 * * *', async () => {
     try {
         await checkCoinList(conn);
         const myAccount = await getMyAccount();
@@ -34,7 +35,7 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
         buyCoinList = [];
 
         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
-        
+
         buyCoin.forEach(async coin => {
             const buyCoinInfo = myAccount.find(val => val.currency === coin.market.split('-')[1]);
             const res = await postSellCoin(coin.market, buyCoinInfo?.balance as string);
@@ -76,11 +77,24 @@ app.get('/todayCoinList', async (req, res) => {
 })
 
 app.get('/buyCoin', async (req, res) => {
-    let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+    const buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
     if (buyCoin.length === 0) {
         res.send("구매한 코인 없습니다.");
     } else {
-        res.send(buyCoin.map(coin => coin.market).join(', '));
+        const nowPrice = await getNowPrice(buyCoin.map(coin => coin.market));
+
+        res.send(
+            buyCoin.map(
+                (coin, index) => {
+                    const np = nowPrice[index].trade_price;
+                    const per = ((np - coin.buyPrice) / np * 100).toFixed(2);
+                    return {
+                        market: coin.market,
+                        nowPrice: np,
+                        per: per
+                    }
+                }))
+            ;
     }
 });
 
