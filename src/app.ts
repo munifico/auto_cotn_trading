@@ -27,7 +27,7 @@ dbConnect(conn)
 
 let buyCoinList: string[] = [];
 
-let checkCoinListJob = new CronJob.CronJob('0 30 9 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 19 21 * * *', async () => {
     try {
         await checkCoinList(conn);
         const myAccount = await getMyAccount();
@@ -51,22 +51,22 @@ let checkCoinListJob = new CronJob.CronJob('0 30 9 * * *', async () => {
 
 
 
-let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
-    try {
-        const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
-        let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
-        if (buyCoin.length === 0) {
-            tradingCoin(conn, candidateCoinsBuy as TodayCoinList[], buyCoinList);
-        } else {
-            buyCoin.forEach(async coin => {
-                buyCoinList.push(await sellingCoin(conn, coin.market));
-            })
-        }
-    } catch (e) {
-        console.error(e)
-        slackSend(`[tradingSellingCoinJob] ${e}`);
-    }
-}, null, true);
+// let tradingSellingCoinJob = new CronJob.CronJob('* * 10-23,0-9 * * *', async () => {
+//     try {
+//         const candidateCoinsBuy = await getTodayCoinList(conn, TODAY_COIN_LENGTH);
+//         let buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
+//         if (buyCoin.length === 0) {
+//             tradingCoin(conn, candidateCoinsBuy as TodayCoinList[], buyCoinList);
+//         } else {
+//             buyCoin.forEach(async coin => {
+//                 buyCoinList.push(await sellingCoin(conn, coin.market));
+//             })
+//         }
+//     } catch (e) {
+//         console.error(e)
+//         slackSend(`[tradingSellingCoinJob] ${e}`);
+//     }
+// }, null, true);
 
 
 
@@ -79,7 +79,13 @@ app.get('/todayCoinList', async (req, res) => {
 app.get('/buyCoin', async (req, res) => {
     const buyCoin = await getNowBuyCoin(conn) as RowDataPacket[];
     if (buyCoin.length === 0) {
-        res.send("구매한 코인 없습니다.");
+        res.send([
+            {
+                market: "",
+                nowPrice: 0,
+                pre: 0 
+            }
+        ]);
     } else {
         const nowPrice = await getNowPrice(buyCoin.map(coin => coin.market));
 
@@ -87,11 +93,11 @@ app.get('/buyCoin', async (req, res) => {
             buyCoin.map(
                 (coin, index) => {
                     const np = nowPrice[index].trade_price;
-                    const per = ((np - coin.buyPrice) / np * 100).toFixed(2);
+                    const pre = ((np - coin.buyPrice) / np * 100).toFixed(2);
                     return {
                         market: coin.market,
                         nowPrice: np,
-                        per: per
+                        pre: +pre 
                     }
                 }))
             ;
