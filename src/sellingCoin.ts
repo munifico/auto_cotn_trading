@@ -11,11 +11,13 @@ export default async function sellingCoin(conn : Connection,coin: string) {
     const sellLine = MALine - (MALine * 0.01);
     const myAccount = await getMyAccount();
     const buyCoinInfo = myAccount.find(val => val.currency === coin.split('-')[1]);
-    const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.01;
+    const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.02;
     const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.03;
-
+    
+    
     
     const [{ trade_price: nowPrice }] = await getNowPrice([coin]);
+    
 
     if (nowPrice < sellLine ||
         nowPrice < lowerLimit ||
@@ -33,7 +35,7 @@ export default async function sellingCoin(conn : Connection,coin: string) {
             slackSend(`[매도]${coin} 을(를) ${nowPrice}에 매매 하였습니다.`);
             console.log(`[매도]${coin} 을(를) ${nowPrice}에 매매 하였습니다.`);
     }
-
+    
 
     return coin;
 }
