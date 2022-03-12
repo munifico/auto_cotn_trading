@@ -26,7 +26,7 @@ const conn = dbInit();
 dbConnect(conn)
 
 
-let checkCoinListJob = new CronJob.CronJob('0 30 9 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 19 21 * * *', async () => {
     try {
         await checkCoinList(conn);
         const myAccount = await getMyAccount();
