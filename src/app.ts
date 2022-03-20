@@ -26,7 +26,7 @@ const conn = dbInit();
 dbConnect(conn)
 
 
-let checkCoinListJob = new CronJob.CronJob('0 19 21 * * *', async () => {
+let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
     try {
         await checkCoinList(conn);
         const myAccount = await getMyAccount();
@@ -117,11 +117,12 @@ app.get('/coinState', async (req, res) => {
         }
 
         const moneyRise = (coinInfo as TodayCoinList)?.targetPrice - nowPrice.trade_price;
-        const perRise = moneyRise / nowPrice.trade_price * 100;
+        const preRise = moneyRise / nowPrice.trade_price * 100;
         res.send({
-            coinInfo,
+            ...coinInfo,
             moneyRise,
-            perRise
+            preRise,
+            nowPrice : nowPrice.trade_price
         })
     } catch (error) {
         console.log(error);
@@ -149,4 +150,4 @@ app.get('/tradingHistory', async (req, res) => {
 
 
 
-app.listen(9999, "localhost", () => console.log("승재 코인 API시작 :)"));
+app.listen(9999, "0.0.0.0", () => console.log("승재 코인 API시작 :)"));

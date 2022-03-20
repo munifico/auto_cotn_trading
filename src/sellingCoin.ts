@@ -11,8 +11,8 @@ export default async function sellingCoin(conn : Connection,coin: string) {
     const sellLine = MALine - (MALine * 0.01);
     const myAccount = await getMyAccount();
     const buyCoinInfo = myAccount.find(val => val.currency === coin.split('-')[1]);
-    const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.02;
-    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.03;
+    const lowerLimit = Number(buyCoinInfo?.avg_buy_price) - Number(buyCoinInfo?.avg_buy_price) * 0.03;
+    const upperLimit = Number(buyCoinInfo?.avg_buy_price) + Number(buyCoinInfo?.avg_buy_price) * 0.1;
     
     
     
