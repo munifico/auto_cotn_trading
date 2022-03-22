@@ -1,6 +1,6 @@
 import { Connection } from 'mysql2';
 import { TodayCoinList } from './../types/dbResposeType';
-import { getNowPrice, postBuyCoin } from '../api/coin';
+import { getMyAccount, getNowPrice, postBuyCoin } from '../api/coin';
 import { makeMALine } from '../utils/coinUtil';
 import { slackSend } from '../api/slack';
 import { insertTradingList } from '../database/coinDatabase';
