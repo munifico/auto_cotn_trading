@@ -35,12 +35,12 @@ export default async function sellingCoin(conn : Connection,coin: string) {
                 throw new Error('내 계좌에서 해당 코인을 찾을 수 없습니다. 빨리 확인해 주세요');
             }
             slackSend(`
-            [매도][${nowPrice < sellLine ? "이동평균선 이탈로 인한 매매" :
+            [매도][${nowPrice < sellLine ? "이동평균선 이탈로 인한 매도" :
                   nowPrice < lowerLimit ? "하한선 이탈로 인한 손절" : 
-                  "상한선 이탈로 인한 익절"}]${coin} 을(를) ${nowPrice}에 매매 하였습니다.`);
-            console.log(`[매도]${coin} 을(를) ${nowPrice}에 매매 하였습니다.`);
+                  "상한선 이탈로 인한 익절"}]${coin} 을(를) ${nowPrice}에 매도 하였습니다.`);
+            console.log(`[매도]${coin} 을(를) ${nowPrice}에 매도 하였습니다.`);
     }
-    
+     
 
     return coin;
 }
