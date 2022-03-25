@@ -11,7 +11,7 @@ import { RowDataPacket } from 'mysql2';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
 import checkCoinList from './checkCoinList';
-import { makeMALine } from '../utils/coinUtil';
+import { getNowKRW, makeMALine } from '../utils/coinUtil';
 
 
 
@@ -37,7 +37,8 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
             const buyCoinInfo = myAccount.find(val => val.currency === coin.market.split('-')[1]);
             const res = await postSellCoin(coin.market, buyCoinInfo?.balance as string);
             const [{ trade_price: nowPrice }] = await getNowPrice([coin.market]);
-            updateTradingList(conn, coin.market, res.created_at.split("+")[0], nowPrice);
+            const nowBalance = await getNowKRW();
+            updateTradingList(conn, coin.market, res.created_at.split("+")[0], nowPrice, nowBalance);
             slackSend(`[다음날 전량 매도] ${coin.market}을 ${nowPrice}에 매도 하였습니다.`);
         });
     } catch (e) {

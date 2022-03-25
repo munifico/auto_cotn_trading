@@ -12,5 +12,5 @@ export async function getNowKRW() {
     const myAccount = await getMyAccount();
     const nowKRW = myAccount.find(val => val.currency === "KRW");
 
-    return (nowKRW as AccountInfo).balance;
+    return +(nowKRW as AccountInfo).balance;
 }

@@ -59,15 +59,16 @@ export function insertTradingList(
     id: string,
     buyDate: string,
     market: string,
-    buyPrice: number
+    buyPrice: number,
+    nowBalance : number
 ) {
 
     const params = [
-        id, buyDate, market, buyPrice
+        id, buyDate, market, buyPrice, nowBalance
     ];
     const sql = `INSERT INTO 
-        coinAutoTrading.tradingList (c_id, buyDate, market, buyPrice) 
-        VALUES (? ,?, ?, ?)`;
+        coinAutoTrading.tradingList (c_id, buyDate, market, buyPrice, buyBalance) 
+        VALUES (? ,?, ?, ?, ?)`;
     conn.query(sql, params, (err) => {
         if (err) console.error('[insertTradingList] err\n' + err);
         else console.log('[insertTradingList] update')
@@ -78,14 +79,15 @@ export function updateTradingList(
     conn: Connection,
     id: string,
     sellDate: string,
-    sellPrice: number
+    sellPrice: number,
+    nowBalance : number
 ) {
 
     const params = [
-        sellDate, sellPrice
+        sellDate, sellPrice , nowBalance
     ];
     const sql = `UPDATE coinAutoTrading.tradingList t 
-                 SET t.sellDate = ? , t.sellPrice = ? 
+                 SET t.sellDate = ? , t.sellPrice = ? , t.sellBalance = ? 
                  WHERE c_id LIKE '%${id}' AND sellPrice IS NULL`;
     conn.query(sql, params, (err) => {
         if (err) console.error('[updateTradingList] err\n' + err);

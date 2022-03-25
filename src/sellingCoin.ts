@@ -1,9 +1,8 @@
-import { kMaxLength } from 'buffer';
 import { Connection } from 'mysql2';
 import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { updateTradingList } from '../database/coinDatabase';
-import { makeMALine } from '../utils/coinUtil';
+import { getNowKRW, makeMALine } from '../utils/coinUtil';
 
 
 export default async function sellingCoin(conn : Connection,coin: string) {
@@ -18,7 +17,6 @@ export default async function sellingCoin(conn : Connection,coin: string) {
     
     const [{ trade_price: nowPrice }] = await getNowPrice([coin]);
     
-    console.log(MALine)
 
     if (
         nowPrice < sellLine ||
@@ -29,8 +27,14 @@ export default async function sellingCoin(conn : Connection,coin: string) {
             if(buyCoinInfo?.balance){
                 const [,coinName] = coin.split('-');
                 const res = await postSellCoin(coin, buyCoinInfo?.balance);
+                const nowBalance = await getNowKRW();
                 console.log(res);
-                updateTradingList(conn, coin , res.created_at.split("+")[0], nowPrice);
+                updateTradingList(
+                    conn, 
+                    coin, 
+                    res.created_at.split("+")[0], 
+                    nowPrice,
+                    nowBalance);
             }else{
                 throw new Error('내 계좌에서 해당 코인을 찾을 수 없습니다. 빨리 확인해 주세요');
             }
