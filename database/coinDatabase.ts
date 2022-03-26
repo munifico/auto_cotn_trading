@@ -1,4 +1,6 @@
 import { Connection, Query } from "mysql2";
+import { getNowKRW } from "../utils/coinUtil";
+import { dateFormat } from "../utils/dateUtill";
 
 export async function getTodayCoinList(conn: Connection, limit: number) {
     const sql = `SELECT t.*
@@ -114,4 +116,16 @@ export async function getTradingHistory(conn: Connection, index: number) {
 
     const [rows, fields] = await promisePoll.query(sql, params);
     return rows;
+}
+
+export async function updateDateBalance(conn: Connection) {
+    const today = new Date();
+    const date = dateFormat(today);
+    const nowBalance = getNowKRW();
+    
+    const sql = `INSERT INTO coinAutoTrading.dateBalance (date, dalance) VALUES ('?', ?)`;
+    conn.query(sql, [date, nowBalance], (err) => {
+        if (err) console.error('[updateDateBalance] err\n' + err);
+        else console.log('[updateDateBalance] update')
+    })
 }

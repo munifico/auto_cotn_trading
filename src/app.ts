@@ -6,7 +6,7 @@ import CronJob from 'cron';
 import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { dbConnect, dbInit } from '../database/databases';
-import { getNowBuyCoin, getTodayCoinList, getTradingHistory, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
+import { getNowBuyCoin, getTodayCoinList, getTradingHistory, updateDateBalance, updateTargetPrice, updateTradingList } from '../database/coinDatabase';
 import { RowDataPacket } from 'mysql2';
 import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
@@ -40,6 +40,7 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
             const nowBalance = await getNowKRW();
             updateTradingList(conn, coin.market, res.created_at.split("+")[0], nowPrice, nowBalance);
             slackSend(`[다음날 전량 매도] ${coin.market}을 ${nowPrice}에 매도 하였습니다.`);
+            updateDateBalance(conn);
         });
     } catch (e) {
         console.error(e)
