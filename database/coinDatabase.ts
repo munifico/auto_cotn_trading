@@ -109,8 +109,8 @@ export async function getNowBuyCoin(
 }
 
 export async function getTradingHistory(conn: Connection, index: number) {
-    const params = [index, index + 5];
-    const sql = `SELECT * from coinAutoTrading.tradingList t ORDER BY t.id LIMIT ?,?`;
+    const params = [index, index + 10];
+    const sql = `SELECT * from coinAutoTrading.tradingList t ORDER BY t.id DESC LIMIT ?,?`;
 
     const promisePoll = conn.promise();
 
