@@ -146,8 +146,12 @@ app.patch('/ResettingK', async (req, res) => {
 
 app.get('/tradingHistory', async (req, res) => {
     const { index } = req.query;
-
-    res.send(await getTradingHistory(conn, Number(index)));
+    const history = await getTradingHistory(conn, Number(index));
+    const nextIndex = Number(index) + 10;
+    res.send({
+        history,
+        nextIndex
+    });
 })
 
 
