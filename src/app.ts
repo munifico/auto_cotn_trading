@@ -12,6 +12,7 @@ import tradingCoin from './tradingCoin';
 import sellingCoin from './sellingCoin';
 import checkCoinList from './checkCoinList';
 import { getNowKRW, makeMALine } from '../utils/coinUtil';
+import timer from '../utils/timer';
 
 
 
@@ -37,6 +38,9 @@ let checkCoinListJob = new CronJob.CronJob('0 0 9 * * *', async () => {
             const buyCoinInfo = myAccount.find(val => val.currency === coin.market.split('-')[1]);
             const res = await postSellCoin(coin.market, buyCoinInfo?.balance as string);
             const [{ trade_price: nowPrice }] = await getNowPrice([coin.market]);
+
+            timer(1);
+
             const nowBalance = await getNowKRW();
             updateTradingList(conn, coin.market, res.created_at.split("+")[0], nowPrice, nowBalance);
             slackSend(`[다음날 전량 매도] ${coin.market}을 ${nowPrice}에 매도 하였습니다.`);
@@ -145,13 +149,17 @@ app.patch('/ResettingK', async (req, res) => {
 })
 
 app.get('/tradingHistory', async (req, res) => {
-    const { index } = req.query;
-    const history = await getTradingHistory(conn, Number(index));
-    const nextIndex = Number(index) + 10;
-    res.send({
-        history,
-        nextIndex
-    });
+    try{
+        const { index } = req.query;
+        const history = await getTradingHistory(conn, Number(index));
+        const nextIndex = Number(index) + 10;
+        res.send({
+            history,
+            nextIndex
+        });
+    }catch(e){
+        console.error(e);
+    }
 })
 
 

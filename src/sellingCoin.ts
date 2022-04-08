@@ -3,6 +3,7 @@ import { getMyAccount, getNowPrice, postSellCoin } from '../api/coin';
 import { slackSend } from '../api/slack';
 import { updateTradingList } from '../database/coinDatabase';
 import { getNowKRW, makeMALine } from '../utils/coinUtil';
+import timer from '../utils/timer';
 
 
 export default async function sellingCoin(conn : Connection,coin: string) {
@@ -27,6 +28,9 @@ export default async function sellingCoin(conn : Connection,coin: string) {
             if(buyCoinInfo?.balance){
                 const [,coinName] = coin.split('-');
                 const res = await postSellCoin(coin, buyCoinInfo?.balance);
+
+                await timer(1);
+
                 const nowBalance = await getNowKRW();
                 console.log(res);
                 updateTradingList(
